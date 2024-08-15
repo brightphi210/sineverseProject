@@ -81,9 +81,25 @@ class DailyRewardView(generics.ListCreateAPIView):
     serializer_class = DailyRewardSerializer
 
     def create(self, request, *args, **kwargs):
-        user_details = DailyReward.objects.get(user=request.user)
+        tgID = request.data.get('tgID')
+
+        if not tgID:
+            return Response(
+                {"message": "tgID Required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            user = UserDetails.objects.get(tgID=tgID)
+        except UserDetails.DoesNotExist:
+            return Response(
+                {"message": "User not found with given tgID."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
         today = timezone.now().date()
-        reward, created = DailyReward.objects.get_or_create(user=user_details)
+        reward, created = DailyReward.objects.get_or_create(user=user)
+
         if reward.last_claimed == today:
             return Response(
                 {"message": "Reward already claimed today."}, 
@@ -92,13 +108,51 @@ class DailyRewardView(generics.ListCreateAPIView):
         else:
             reward.last_claimed = today
             reward.trackEachDayCount += 1
-            oldAmount = reward.amountGained
-            reward.amountGained = reward.amountGained + oldAmount
+            oldAmount = reward.oldAmount
+            reward.amountGained += oldAmount
+
             reward.save()
             return Response(
                 {
                     "message": "Reward claimed successfully.", 
-                    "amountGained": reward.amountGained
+                    "amountGained": reward.amountGained,
+                    "trackEachDayCount": reward.trackEachDayCount
                 },
                 status=status.HTTP_201_CREATED
             )
+
+
+
+class DailyRewardUpdate(generics.RetrieveUpdateAPIView):
+    queryset = DailyReward.objects.all()
+    serializer_class = DailyRewardSerializer
+    lookup_field = 'pk'
+
+    def update_reward(self, serializers):
+        instance = serializers
+        return instance
+    
+
+class WalletAddressView(generics.ListCreateAPIView):
+    queryset = WalletAddress.objects.all()
+    serializer_class = WalletAddressSerializer
+
+    def create(self, request, *args, **kwargs):
+        response =  super().create(request, *args, **kwargs)
+
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({
+                'message' : 'wallet address was created successfully',
+            },
+                status= status.HTTP_201_CREATED
+            )
+        
+
+class WalletAddressUpdateView(generics.RetrieveUpdateAPIView):
+    queryset = WalletAddress.objects.all()
+    serializer_class = WalletAddressSerializer
+    lookup_field = 'pk'
+
+    def update_wallet(self, serializers):
+        instance = serializers
+        return instance

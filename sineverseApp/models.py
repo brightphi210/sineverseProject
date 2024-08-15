@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class UserDetails(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     tgID = models.CharField(max_length=255, blank=True, null=True)
     tgUsername = models.CharField(max_length=255, blank=True, null=True)
@@ -38,7 +37,7 @@ class MineBoost(models.Model):
     mineBoostLevel = models.CharField(max_length=255, choices=MINELEVELS, blank=True, null=True)
 
     def __str__(self):
-        return f"User {self.user.name} purchased {self.mineBoostLevel} for {self.amountToPurchased} gold points."
+        return f"User {self.user.name} purchased {self.mineBoostLevel}  gold points."
     
 
 
@@ -52,9 +51,32 @@ class PurchaseMine(models.Model):
 
 class DailyReward(models.Model):
     user = models.ForeignKey(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
-    amountGained = models.IntegerField(blank=True, null=True)
+    oldAmount = models.IntegerField(default=0, blank=True, null=True)
+    amountGained = models.IntegerField(default=0, blank=True, null=True)
     trackEachDayCount = models.IntegerField(default=0, null=True, blank=True)
     last_claimed = models.DateField(blank=True, null=True)
+    tgID = models.CharField(blank=True, null=True, max_length=255)
 
     def _str__(self):
         return f"User {self.user.name} gained {self.amountGained} gold points on {self.laste_claimed}."
+    
+
+
+class WalletAddress(models.Model):
+    user = models.ForeignKey(UserDetails, related_name='wallet_address', on_delete=models.CASCADE)
+    walletAddress = models.CharField(max_length=255, blank=True, null=True)
+    isConnected = models.BooleanField(default=False, blank=True, null=True)
+
+
+    def __str__(self):
+        return f"User {self.user.name} has their wallet address: {self.walletAddress}."
+    
+
+class ListInvites(models.Model):
+    user = models.ForeignKey(UserDetails, related_name='invites', on_delete=models.CASCADE)
+    inviteCode = models.CharField(max_length=255, blank=True, null=True)
+    invitesName = models.CharField(max_length=255, blank=True, null=True)
+    inviteCoinBalance = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        return f"User {self.user.name} invited {self.invitesName} with a code {self.inviteCode} and balance {self.inviteCoinBalance}."

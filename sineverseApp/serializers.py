@@ -30,11 +30,18 @@ class PurchaseMineSerializer(serializers.ModelSerializer):
         model = PurchaseMine
         fields = '__all__'    
 
+
+class WalletAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WalletAddress
+        fields = ['walletAddress', 'isConnected']
+
 # ============ USER DETAILS SERIALIZER =============
 class UserDetailsSerializer(serializers.ModelSerializer):
     # ============ ALL RELATED NAMES MODELS ==========
     mine_boost = MineBoostSerializer(many=True)
     daily_reward = DailyRewardSerializer(many=True)
+    wallet_address = WalletAddressSerializer()
 
 
     class Meta:
