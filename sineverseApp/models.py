@@ -50,7 +50,7 @@ class PurchaseMine(models.Model):
 
 
 class DailyReward(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.ForeignKey(UserDetails, related_name='daily_reward', on_delete=models.CASCADE)
     oldAmount = models.IntegerField(default=0, blank=True, null=True)
     amountGained = models.IntegerField(default=0, blank=True, null=True)
     trackEachDayCount = models.IntegerField(default=0, null=True, blank=True)
@@ -58,7 +58,7 @@ class DailyReward(models.Model):
     tgID = models.CharField(blank=True, null=True, max_length=255)
 
     def _str__(self):
-        return f"User {self.user.name} gained {self.amountGained} gold points on {self.laste_claimed}."
+        return f"User {self.user.name} gained {self.amountGained} gold points on {self.last_claimed}."
     
 
 
@@ -72,7 +72,7 @@ class WalletAddress(models.Model):
         return f"User {self.user.name} has their wallet address: {self.walletAddress}."
     
 
-class ListInvites(models.Model):
+class ListOfInvites(models.Model):
     user = models.ForeignKey(UserDetails, related_name='invites', on_delete=models.CASCADE)
     inviteCode = models.CharField(max_length=255, blank=True, null=True)
     invitesName = models.CharField(max_length=255, blank=True, null=True)

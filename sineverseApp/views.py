@@ -156,3 +156,24 @@ class WalletAddressUpdateView(generics.RetrieveUpdateAPIView):
     def update_wallet(self, serializers):
         instance = serializers
         return instance
+    
+
+class ListOfInvitesView(generics.ListCreateAPIView):
+    queryset = ListOfInvites.objects.all()
+    serializer_class = ListOfInvitesSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = super().create(self, request, *args, **kwargs)
+        if response.status_code == status.HTTP_201_CREATED:
+            return Response({
+                'message' : 'invite was created successfully',
+            },
+                status= status.HTTP_201_CREATED
+            )
+        
+        else:
+            return Response({
+                'message' : 'invite creation failed',
+            },
+                status= status.HTTP_401_UNAUTHORIZED
+            )

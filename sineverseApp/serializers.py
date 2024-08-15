@@ -36,6 +36,12 @@ class WalletAddressSerializer(serializers.ModelSerializer):
         model = WalletAddress
         fields = ['walletAddress', 'isConnected']
 
+
+class ListOfInvitesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ListOfInvites
+        fields = '__all__'
+
 # ============ USER DETAILS SERIALIZER =============
 class UserDetailsSerializer(serializers.ModelSerializer):
     # ============ ALL RELATED NAMES MODELS ==========

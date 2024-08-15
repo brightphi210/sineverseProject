@@ -15,4 +15,7 @@ urlpatterns = [
     # =================== WALLET ADDRESS ==================
     path('wallet_address/', WalletAddressView.as_view(), name='wallet_address'),
     path('wallet_address/update/<str:pk>/', WalletAddressUpdateView.as_view(), name='wallet_address_update'),
+
+    path('list_invites/', ListOfInvitesView.as_view(), name='list_invites'),
+
 ]
