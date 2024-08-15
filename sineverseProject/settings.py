@@ -66,12 +66,20 @@ WSGI_APPLICATION = 'sineverseProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+import dj_database_url
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default' : dj_database_url.parse("postgresql://sinverse_user:2hDgMSf2i4fLJhOMihlSzmbQLe0IFFqx@dpg-cqv6fnbv2p9s73ed0t9g-a.ohio-postgres.render.com/sinverse")
 }
+
+# 
 
 
 # Password validation
