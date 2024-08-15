@@ -163,7 +163,7 @@ class ListOfInvitesView(generics.ListCreateAPIView):
     serializer_class = ListOfInvitesSerializer
 
     def create(self, request, *args, **kwargs):
-        response = super().create(self, request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
         if response.status_code == status.HTTP_201_CREATED:
             return Response({
                 'message' : 'invite was created successfully',
