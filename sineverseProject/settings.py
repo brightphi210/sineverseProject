@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'rest_framework',
     # 'django.contrib.staticfiles',
     'drf_yasg',
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -41,13 +42,16 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
-        "django.middleware.security.SecurityMiddleware",
+    "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 ROOT_URLCONF = 'sineverseProject.urls'
 
-
+CORS_ALLOW_ALL_ORIGINS : True
 
 TEMPLATES = [
     {
