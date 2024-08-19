@@ -45,10 +45,9 @@ class ListOfInvitesSerializer(serializers.ModelSerializer):
 # ============ USER DETAILS SERIALIZER =============
 class UserDetailsSerializer(serializers.ModelSerializer):
     # ============ ALL RELATED NAMES MODELS ==========
-    mine_boost = MineBoostSerializer(many=True)
-    daily_reward = DailyRewardSerializer(many=True)
-    wallet_address = WalletAddressSerializer()
-
+    mine_boost = MineBoostSerializer(many=True, required=False)
+    daily_reward = DailyRewardSerializer(many=True, required=False)
+    wallet_address = WalletAddressSerializer(required=False)
 
     class Meta:
         model = UserDetails

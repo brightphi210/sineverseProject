@@ -7,7 +7,7 @@ class UserDetails(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
     tgID = models.CharField(max_length=255, blank=True, null=True)
     tgUsername = models.CharField(max_length=255, blank=True, null=True)
-    avatar = models.ImageField(blank=True, null=True, upload_to='images')
+    avatar = models.URLField(max_length=255, blank=True, null=True)
     miningPoint = models.IntegerField(blank=True, null=True)
     goldPoint = models.IntegerField(blank=True, null=True)
     position = models.IntegerField(blank=True, null=True)
