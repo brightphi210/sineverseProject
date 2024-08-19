@@ -5,31 +5,12 @@ from rest_framework.exceptions import ValidationError
 
 
 
-# ============ MINE BOOST =============
-class MineBoostSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MineBoost
-        fields = '__all__'
-
-
-# ================ PURCHASE SERIALISER =============
-class PurchaseSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PurchaseMine
-        fields = '__all__'
-
-
 # ============ DAILY REWARD SERIALIZER ===================
 class DailyRewardSerializer(serializers.ModelSerializer):
     class Meta:
         model = DailyReward
         fields = '__all__'
 
-
-class PurchaseMineSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PurchaseMine
-        fields = '__all__'    
 
 
 class WalletAddressSerializer(serializers.ModelSerializer):
@@ -43,12 +24,27 @@ class ListOfInvitesSerializer(serializers.ModelSerializer):
         model = ListOfInvites
         fields = '__all__'
 
+
+class SilverCoinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SilverCoin
+        fields = '__all__'
+
+
+class GoldCoinSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GoldCoin
+        fields = '__all__'
+
 # ============ USER DETAILS SERIALIZER =============
 class UserDetailsSerializer(serializers.ModelSerializer):
     # ============ ALL RELATED NAMES MODELS ==========
-    mine_boost = MineBoostSerializer(many=True, required=False)
     daily_reward = DailyRewardSerializer(many=True, required=False)
     wallet_address = WalletAddressSerializer(required=False)
+    list_invites = ListOfInvitesSerializer(many=True, required=False)
+    silver_coin = SilverCoinSerializer(many=True, required=False)
+    gold_coin = GoldCoinSerializer(many=True, required=False)
+    
 
     class Meta:
         model = UserDetails

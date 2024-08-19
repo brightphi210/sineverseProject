@@ -26,43 +26,17 @@ class UserDetailsUpdateView(generics.RetrieveUpdateAPIView):
 
 
 
+class GoldCoinsView(generics.ListAPIView):
+    queryset = GoldCoin.objects.all()
+    serializer_class = GoldCoinSerializer
 
-# ============= BOOST MINE ====================
-class BoostMineView(generics.ListCreateAPIView):
-    queryset = MineBoost.objects.all()
-    serializer_class = MineBoostSerializer
 
-    def create(self, request, *args, **kwargs):
-        response =  super().create(request, *args, **kwargs)
-        if response.status_code == status.HTTP_201_CREATED:
-            return Response(
-                {'message': 'Boost created successfully'},
-                status.HTTP_201_CREATED
-            )
-        else:
-            return Response(
-                {'message': 'Boost creation failed'}, 
-                status.HTTP_401_UNAUTHORIZED
-            )
-        
+class SilverCoinsView(generics.ListAPIView):
+    queryset = SilverCoin.objects.all()
+    serializer_class = SilverCoinSerializer   
 
-# =============== BOOST MINE UPDATE ====================
-class BoostMineUpdateView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = MineBoost.objects.all()
-    serializer_class = MineBoostSerializer
-    lookup_field = 'pk'
-
-    def update_mine(self, serializer):
-        instance = serializer
-        return instance
-    
 
 from django.utils import timezone
-# ============= PURCHASE MINE ==================
-class PurchaseMineView(generics.ListCreateAPIView):
-    queryset = PurchaseMine.objects.all()
-    serializer_class = PurchaseMineSerializer
-
 
 # ============ DAILY REWARD =================
 class DailyRewardView(generics.ListCreateAPIView):
@@ -109,18 +83,6 @@ class DailyRewardView(generics.ListCreateAPIView):
                 },
                 status=status.HTTP_201_CREATED
             )
-
-
-
-class DailyRewardUpdate(generics.RetrieveUpdateAPIView):
-    queryset = DailyReward.objects.all()
-    serializer_class = DailyRewardSerializer
-    lookup_field = 'pk'
-
-    def update_reward(self, serializers):
-        instance = serializers
-        return instance
-    
 
 class WalletAddressView(generics.ListCreateAPIView):
     queryset = WalletAddress.objects.all()
