@@ -35,7 +35,7 @@ class PurchaseMineSerializer(serializers.ModelSerializer):
 class WalletAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = WalletAddress
-        fields = ['walletAddress', 'isConnected']
+        fields = '__all__'
 
 
 class ListOfInvitesSerializer(serializers.ModelSerializer):
