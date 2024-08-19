@@ -32,9 +32,9 @@ class GoldCoin(models.Model):
 
 class DailyReward(models.Model):
     user = models.ForeignKey(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
-    oldAmount = models.IntegerField(default=0, blank=True, null=True)
-    amountGained = models.IntegerField(default=0, blank=True, null=True)
-    trackEachDayCount = models.IntegerField(default=0, null=True, blank=True)
+    oldAmount = models.IntegerField(default=0)
+    amountGained = models.IntegerField(default=0)
+    trackEachDayCount = models.IntegerField(default=0)
     last_claimed = models.DateField(blank=True, null=True)
     tgID = models.CharField(blank=True, null=True, max_length=255)
 

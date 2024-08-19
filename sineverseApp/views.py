@@ -39,50 +39,46 @@ class SilverCoinsView(generics.ListCreateAPIView):
 from django.utils import timezone
 
 # ============ DAILY REWARD =================
+
 class DailyRewardView(generics.ListCreateAPIView):
     queryset = DailyReward.objects.all()
     serializer_class = DailyRewardSerializer
 
-    def create(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
+        # Assuming the user's tgID is passed in the request data
         tgID = request.data.get('tgID')
+        user = UserDetails.objects.filter(tgID=tgID).first()
 
-        if not tgID:
-            return Response(
-                {"message": "tgID Required."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        try:
-            user = UserDetails.objects.get(tgID=tgID)
-        except UserDetails.DoesNotExist:
-            return Response(
-                {"message": "User not found with given tgID."},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        if not user:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
 
         today = timezone.now().date()
-        reward, created = DailyReward.objects.get_or_create(user=user)
+        last_reward = DailyReward.objects.filter(user=user).order_by('-last_claimed').first()
 
-        if reward.last_claimed == today:
-            return Response(
-                {"message": "Reward already claimed today."}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        else:
-            reward.last_claimed = today
-            reward.trackEachDayCount += 1
-            oldAmount = reward.oldAmount
-            reward.amountGained += oldAmount
+        if last_reward and last_reward.last_claimed == today:
+            return Response({"detail": "Daily reward already claimed for today."}, status=status.HTTP_400_BAD_REQUEST)
 
-            reward.save()
-            return Response(
-                {
-                    "message": "Reward claimed successfully.", 
-                    "amountGained": reward.amountGained,
-                    "trackEachDayCount": reward.trackEachDayCount
-                },
-                status=status.HTTP_201_CREATED
-            )
+        # Logic for calculating amount gained (this can be customized)
+        amount_gained = 100  # Example fixed amount or could be random or based on logic
+
+        # Create or update the daily reward
+        daily_reward = DailyReward.objects.create(
+            user=user,
+            oldAmount=user.position,
+            amountGained=amount_gained,
+            trackEachDayCount=(last_reward.trackEachDayCount + 1) if last_reward else 1,
+            last_claimed=today,
+            tgID=user.tgID
+        )
+
+        # Update user’s position (energy level)
+        user.position += amount_gained
+        user.save()
+
+        serializer = self.get_serializer(daily_reward)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
 
 class WalletAddressView(generics.ListCreateAPIView):
     queryset = WalletAddress.objects.all()
