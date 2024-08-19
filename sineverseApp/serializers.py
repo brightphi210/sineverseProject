@@ -1,6 +1,7 @@
 
 from rest_framework import serializers
 from .models import *
+from rest_framework.exceptions import ValidationError
 
 
 
@@ -52,3 +53,9 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserDetails
         fields = '__all__'
+
+    def create(self, validated_data):
+        tgID = validated_data.get('tgID')
+        if UserDetails.objects.filter(tgID=tgID).exists():
+            raise ValidationError(f"User with tgID {tgID} already exists.")
+        return super().create(validated_data)
