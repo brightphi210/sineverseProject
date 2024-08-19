@@ -35,7 +35,7 @@ class DailyReward(models.Model):
     oldAmount = models.IntegerField(default=0)
     amountGained = models.IntegerField(default=0)
     trackEachDayCount = models.IntegerField(default=0)
-    last_claimed = models.DateField(blank=True, null=True)
+    last_claimed = models.DateField(auto_now_add=True)
     tgID = models.CharField(blank=True, null=True, max_length=255)
 
     def _str__(self):
