@@ -8,8 +8,8 @@ class UserDetails(models.Model):
     tgID = models.CharField(max_length=255, blank=True, null=True)
     tgUsername = models.CharField(max_length=255, blank=True, null=True)
     avatar = models.URLField(max_length=255, blank=True, null=True)
-    position = models.IntegerField(default=0, blank=True, null=True)
-    maxEnergyLevel = models.IntegerField(default=2000, blank=True, null=True)
+    position = models.IntegerField(default=0)
+    maxEnergyLevel = models.IntegerField(default=2000)
 
     def __str__(self):
         return f"This is user {self.name}"
