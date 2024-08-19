@@ -42,8 +42,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     daily_reward = DailyRewardSerializer(many=True, required=False)
     wallet_address = WalletAddressSerializer(required=False)
     list_invites = ListOfInvitesSerializer(many=True, required=False)
-    silver_coin = SilverCoinSerializer(many=True, required=False)
-    gold_coin = GoldCoinSerializer(many=True, required=False)
+    silver_coin = SilverCoinSerializer(required=False)
+    gold_coin = GoldCoinSerializer(required=False)
     
 
     class Meta:

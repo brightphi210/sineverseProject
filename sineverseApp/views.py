@@ -26,12 +26,12 @@ class UserDetailsUpdateView(generics.RetrieveUpdateAPIView):
 
 
 
-class GoldCoinsView(generics.ListAPIView):
+class GoldCoinsView(generics.ListCreateAPIView):
     queryset = GoldCoin.objects.all()
     serializer_class = GoldCoinSerializer
 
 
-class SilverCoinsView(generics.ListAPIView):
+class SilverCoinsView(generics.ListCreateAPIView):
     queryset = SilverCoin.objects.all()
     serializer_class = SilverCoinSerializer   
 
