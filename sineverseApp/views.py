@@ -13,17 +13,6 @@ class UserDetailView(generics.ListCreateAPIView):
     queryset = UserDetails.objects.all()
     serializer_class = UserDetailsSerializer
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        if response.status_code == status.HTTP_201_CREATED:
-            return Response(
-                {'message': 'User created successfully'}, 
-                status.HTTP_201_CREATED
-            )
-        else:
-            return Response({'message': 'User creation failed'}, status.HTTP_401_UNAUTHORIZED)
-        
-
 
 # =============== USER DETAILS UPDATE ===================
 class UserDetailsUpdateView(generics.RetrieveUpdateAPIView):
