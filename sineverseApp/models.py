@@ -30,35 +30,8 @@ class GoldCoin(models.Model):
         return f"User {self.user.name} has {self.amount} gold coins."
 
 
-
-# class MineBoost(models.Model):
-#     user = models.ForeignKey(UserDetails, related_name='mine_boost', on_delete=models.CASCADE, blank=True, null=True)
-#     MINELEVELS = (
-#         ('Super Mine', 'Super Mine'),
-#         ('Silver Mine', 'Silver Mine'),
-#         ('Gold Mine', 'Gold Mine'),
-#     )
-
-#     superDescription = models.CharField(max_length=255, blank=True, null=True)
-#     silverDescription = models.CharField(max_length=255, blank=True, null=True)
-#     goldDescription = models.CharField(max_length=255, blank=True, null=True)
-#     mineBoostLevel = models.CharField(max_length=255, choices=MINELEVELS, blank=True, null=True)
-
-#     def __str__(self):
-#         return f"User {self.user.name} purchased {self.mineBoostLevel}  gold points."
-    
-
-
-# class PurchaseMine(models.Model):
-#     mineBoost = models.ForeignKey(MineBoost, on_delete=models.CASCADE, null=True, blank=True)
-#     amountToPurchased = models.FloatField(blank=True, null=True)
-
-#     def __str__(self):
-#         return f"User {self.mineBoost.user.name} purchased {self.amountToPurchased} gold points from {self.mineBoost.mineBoostLevel} mine."
-
-
 class DailyReward(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='daily_reward', on_delete=models.CASCADE)
+    user = models.ForeignKey(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
     oldAmount = models.IntegerField(default=0, blank=True, null=True)
     amountGained = models.IntegerField(default=0, blank=True, null=True)
     trackEachDayCount = models.IntegerField(default=0, null=True, blank=True)
@@ -71,17 +44,16 @@ class DailyReward(models.Model):
 
 
 class WalletAddress(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='wallet_address', on_delete=models.CASCADE)
+    user = models.ForeignKey(UserDetails, related_name='wallet_address', on_delete=models.CASCADE, blank=True, null=True)
     walletAddress = models.CharField(max_length=255, blank=True, null=True)
     isConnected = models.BooleanField(default=False, blank=True, null=True)
-
 
     def __str__(self):
         return f"User {self.user.name} has their wallet address: {self.walletAddress}."
     
 
 class ListOfInvites(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='invites', on_delete=models.CASCADE)
+    user = models.ForeignKey(UserDetails, related_name='invites', on_delete=models.CASCADE, blank=True, null=True)
     inviteCode = models.CharField(max_length=255, blank=True, null=True)
     invitesName = models.CharField(max_length=255, blank=True, null=True)
     inviteCoinBalance = models.CharField(max_length=255, blank=True, null=True)
