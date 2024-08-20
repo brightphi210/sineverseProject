@@ -40,10 +40,10 @@ class GoldCoinSerializer(serializers.ModelSerializer):
 class UserDetailsSerializer(serializers.ModelSerializer):
     # ============ ALL RELATED NAMES MODELS ==========
     daily_reward = DailyRewardSerializer(required=False, read_only=True)
-    list_invites = ListOfInvitesSerializer(many=True, required=False, read_only=True)
     silver_coin = SilverCoinSerializer(required=False, read_only=True)
-    gold_coin = GoldCoinSerializer(required=False, read_only=True)
+    gold_coin = GoldCoinSerializer(read_only=True, required=False)
     wallet_address = WalletAddressSerializer(required=False, read_only=True)
+    list_invites = ListOfInvitesSerializer(many=True, required=False, read_only=True)
 
     class Meta:
         model = UserDetails

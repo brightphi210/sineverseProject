@@ -31,9 +31,20 @@ class GoldCoinsView(generics.ListCreateAPIView):
     serializer_class = GoldCoinSerializer
 
 
+class GoldCoinsViewUpdate(generics.RetrieveUpdateAPIView):
+    queryset = GoldCoin.objects.all()
+    serializer_class = GoldCoinSerializer
+    lookup_field = 'pk'
+
+
 class SilverCoinsView(generics.ListCreateAPIView):
     queryset = SilverCoin.objects.all()
     serializer_class = SilverCoinSerializer   
+
+
+class SilverCoinsViewUpdate(generics.RetrieveUpdateDestroyAPIView):
+    queryset = SilverCoin.objects.all()
+    serializer_class = SilverCoinSerializer  
 
 
 from django.utils import timezone

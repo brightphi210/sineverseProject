@@ -16,14 +16,14 @@ class UserDetails(models.Model):
 
 
 class SilverCoin(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='silver_coin', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(UserDetails, related_name='silver_coin', on_delete=models.CASCADE, blank=True, null=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
 
     def __str__(self):
         return f"User {self.user.name} has {self.amount} silver coins."
     
 class GoldCoin(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='gold_coin', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(UserDetails, related_name='gold_coin', on_delete=models.CASCADE, null=True , blank=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
     
     def __str__(self):
@@ -31,7 +31,7 @@ class GoldCoin(models.Model):
 
 
 class DailyReward(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
     oldAmount = models.IntegerField(default=0)
     amountGained = models.IntegerField(default=0)
     trackEachDayCount = models.IntegerField(default=0)
@@ -44,7 +44,7 @@ class DailyReward(models.Model):
 
 
 class WalletAddress(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='wallet_address', on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(UserDetails, related_name='wallet_address', on_delete=models.CASCADE, blank=True, null=True)
     walletAddress = models.CharField(max_length=255, blank=True, null=True)
     isConnected = models.BooleanField(default=False, blank=True, null=True)
 
