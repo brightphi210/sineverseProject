@@ -10,9 +10,23 @@ class UserDetails(models.Model):
     avatar = models.URLField(max_length=255, blank=True, null=True)
     position = models.IntegerField(default=0)
     maxEnergyLevel = models.IntegerField(default=2000)
+    referral_code = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals')
+    earned_energy = models.IntegerField(default=0)
 
     def __str__(self):
         return f"This is user {self.name}"
+    
+
+    def save(self, *args, **kwargs):
+        if not self.referral_code:
+            self.referral_code = self.generate_referral_code()
+        super().save(*args, **kwargs)
+
+    def generate_referral_code(self):
+        # Generates a unique referral code (e.g., using a hash or random string)
+        import random, string
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
 
 class SilverCoin(models.Model):
@@ -54,7 +68,6 @@ class WalletAddress(models.Model):
 
 class ListOfInvites(models.Model):
     user = models.ForeignKey(UserDetails, related_name='invites', on_delete=models.CASCADE, blank=True, null=True)
-    inviteCode = models.CharField(max_length=255, blank=True, null=True)
     invitesName = models.CharField(max_length=255, blank=True, null=True)
     inviteCoinBalance = models.CharField(max_length=255, blank=True, null=True)
 

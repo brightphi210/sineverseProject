@@ -45,6 +45,9 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     wallet_address = WalletAddressSerializer(required=False, read_only=True)
     list_invites = ListOfInvitesSerializer(many=True, required=False, read_only=True)
 
+    referral_code = serializers.CharField(read_only=True)
+    referred_by_code = serializers.CharField(write_only=True, required=False)
+
     class Meta:
         model = UserDetails
         fields = '__all__'
@@ -53,4 +56,19 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         tgID = validated_data.get('tgID')
         if UserDetails.objects.filter(tgID=tgID).exists():
             raise ValidationError(f"User with tgID {tgID} already exists.")
-        return super().create(validated_data)
+        
+        referred_by_code = validated_data.pop('referred_by_code', None)
+        user = UserDetails.objects.create(**validated_data)
+
+        if referred_by_code:
+            try:
+                referring_user = UserDetails.objects.get(referral_code=referred_by_code)
+                user.referred_by = referring_user
+                referring_user.earned_energy += 2000  # Increase the referring user's energy
+                referring_user.save()
+            except UserDetails.DoesNotExist:
+                pass
+
+        user.save()
+        return user
+    
