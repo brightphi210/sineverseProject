@@ -33,14 +33,13 @@ class GoldCoinsView(generics.UpdateAPIView):
     lookup_field = 'tgID'
 
     def update(self, request, *args, **kwargs):
+        user_tgID = kwargs.get('tgID')
         try:
-            user_tgID = kwargs.get('tgID')
             user_details = UserDetails.objects.get(tgID=user_tgID)
-            gold_coin = GoldCoin.objects.get(user=user_details)
         except UserDetails.DoesNotExist:
             return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
-        except GoldCoin.DoesNotExist:
-            return Response({"detail": "Gold coin record not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        gold_coin, created = GoldCoin.objects.get_or_create(user=user_details)
 
         serializer = self.get_serializer(gold_coin, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
@@ -55,10 +54,25 @@ class GoldCoinsViewUpdate(generics.RetrieveUpdateAPIView):
     lookup_field = 'pk'
 
 
-class SilverCoinsView(generics.ListCreateAPIView):
+class SilverCoinsView(generics.UpdateAPIView):
     queryset = SilverCoin.objects.all()
     serializer_class = SilverCoinSerializer 
-      
+    lookup_field = 'tgID'
+
+    def update(self, request, *args, **kwargs):
+        user_tgID = kwargs.get('tgID')
+        try:
+            user_details = UserDetails.objects.get(tgID=user_tgID)
+        except UserDetails.DoesNotExist:
+            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        silver_coin, created = SilverCoin.objects.get_or_create(user=user_details)
+
+        serializer = self.get_serializer(silver_coin, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class SilverCoinsViewUpdate(generics.RetrieveUpdateDestroyAPIView):

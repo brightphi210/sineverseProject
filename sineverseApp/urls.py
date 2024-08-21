@@ -8,10 +8,10 @@ urlpatterns = [
     
     
     path('gold_coin/<str:tgID>/', GoldCoinsView.as_view(), name='gold_coin'),
-    path('gold_coin/update/<str:pk>/', GoldCoinsViewUpdate.as_view(), name='gold_coin'),
+    # path('gold_coin/update/<str:pk>/', GoldCoinsViewUpdate.as_view(), name='gold_coin'),
 
-    path('silver_coin/', SilverCoinsView.as_view(), name='silver_coin'),
-    path('silver_coin/update/<str:pk>/', SilverCoinsViewUpdate.as_view(), name='gold_coin'),
+    path('silver_coin/<str:tgID>/', SilverCoinsView.as_view(), name='silver_coin'),
+    # path('silver_coin/update/<str:pk>/', SilverCoinsViewUpdate.as_view(), name='gold_coin'),
     
     path('daily_reward/', DailyRewardView.as_view(), name='daily_reward'),
     # path('daily_reward/update/<str:pk>/', DailyRewardView.as_view(), name='daily_reward'),

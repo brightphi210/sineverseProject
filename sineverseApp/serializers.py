@@ -28,7 +28,7 @@ class ListOfInvitesSerializer(serializers.ModelSerializer):
 class SilverCoinSerializer(serializers.ModelSerializer):
     class Meta:
         model = SilverCoin
-        fields = '__all__'
+        fields = ['amount']
 
 
 class GoldCoinSerializer(serializers.ModelSerializer):
