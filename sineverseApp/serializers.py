@@ -34,7 +34,7 @@ class SilverCoinSerializer(serializers.ModelSerializer):
 class GoldCoinSerializer(serializers.ModelSerializer):
     class Meta:
         model = GoldCoin
-        fields = '__all__'
+        fields = ['amount']
 
 # ============ USER DETAILS SERIALIZER =============
 class UserDetailsSerializer(serializers.ModelSerializer):

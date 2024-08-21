@@ -7,7 +7,7 @@ urlpatterns = [
     path('user_details/update/<str:pk>/', UserDetailsUpdateView.as_view(), name='user_update'),
     
     
-    path('gold_coin/', GoldCoinsView.as_view(), name='gold_coin'),
+    path('gold_coin/<str:tgID>/', GoldCoinsView.as_view(), name='gold_coin'),
     path('gold_coin/update/<str:pk>/', GoldCoinsViewUpdate.as_view(), name='gold_coin'),
 
     path('silver_coin/', SilverCoinsView.as_view(), name='silver_coin'),
