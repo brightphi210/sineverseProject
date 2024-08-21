@@ -64,6 +64,8 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             try:
                 referring_user = UserDetails.objects.get(referral_code=referred_by_code)
                 user.referred_by = referring_user
+                user.save() 
+                
                 referring_user.earned_energy += 2000  # Increase the referring user's energy
                 referring_user.save()
             except UserDetails.DoesNotExist:

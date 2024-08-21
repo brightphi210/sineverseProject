@@ -3,7 +3,7 @@ from .views import *
 
 
 urlpatterns = [
-    path('user_details/', UserDetailView.as_view(), name='user_details'),
+    path('user_details', UserDetailView.as_view(), name='user_details'),
     path('user_details/update/<str:pk>/', UserDetailsUpdateView.as_view(), name='user_update'),
     
     

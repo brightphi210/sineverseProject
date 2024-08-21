@@ -13,6 +13,10 @@ class UserDetailView(generics.ListCreateAPIView):
     queryset = UserDetails.objects.all()
     serializer_class = UserDetailsSerializer
 
+    def perform_create(self, serializer):
+        referral_code = self.request.query_params.get('referrer_code')
+        serializer.save(referred_by_code=referral_code)
+
 
 # =============== USER DETAILS UPDATE ===================
 class UserDetailsUpdateView(generics.RetrieveUpdateAPIView):
