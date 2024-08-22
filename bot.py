@@ -1,36 +1,39 @@
-import os,django
-from sineverseProject.settings import DATABASES,INSTALLED_APPS
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'sineverseProject.settings')
-django.setup()
-from asgiref.sync import sync_to_async
-from sineverseApp.models import UserDetails
-import logging
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext,ApplicationBuilder
-from dotenv import load_dotenv
+import json
+import requests
 
-async def start(update: Update, context: CallbackContext) -> None:
-    user_id = update.effective_user.id
-    try:
-        user_data = await sync_to_async(UserDetails.objects.get)(tgID=user_id)
-        await update.message.reply_text(f'Welcome back {user_data.first_name}!')
-    except UserDetails.DoesNotExist:
-        new_user = UserDetails(id=user_id, first_name=update.effective_user.first_name, last_name=update.effective_user.last_name, username=update.effective_user.username)
-        await sync_to_async(new_user.save)()
-        logging.info(f'New user {new_user.first_name} has been added to the database')
-        await update.message.reply_text('Welcome to django-telegram-bot!')
+# Define your bot token and endpoint
+bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
+web_app_url = "https://t.me/sinversexyz_bot/sinverse"
+welcome_message = ""#RESPONSE MESSAGE
+endpoint = "" #this particlar script endpoint
 
-def main() -> None:
-    logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-    logger = logging.getLogger(__name__)  
-    load_dotenv()
-    token = os.getenv('TOKEN')
-    application = ApplicationBuilder().token(token).build()
-    application.add_handler(CommandHandler('start', start))
-    application.run_polling()
+# Define the URL to set the webhook
+webhook_url = f"https://api.telegram.org/bot{bot_token}/setWebhook?url={endpoint}" #replace  bot_token and this script enpoint url
 
-if __name__ == '__main__':
-    main()
+def send_message(chat_id, message):
+    api_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
+    data = {
+        'chat_id': chat_id,
+        'text': message
+    }
+    response = requests.post(api_url, json=data)
+    return response.json()
+
+def send_message_with_image(chat_id, message, image_path, encoded_keyboard):
+    api_url = f'https://api.telegram.org/bot{bot_token}/sendPhoto'
+    with open(image_path, 'rb') as photo:
+        data = {
+            'chat_id': chat_id,
+            'caption': message,
+            'photo': photo,
+            'reply_markup': encoded_keyboard
+        }
+        response = requests.post(api_url, files=data)
+    return response.json()
+
+def send_start_webapp_button_with_referer(chat_id, username):
+    keyboard = {
+        'inline_keyboard': [[
+            {'text': 'Launch XMeme 💰', 'url': web_app_url}
+        ]]
+    }
