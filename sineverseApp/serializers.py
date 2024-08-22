@@ -89,3 +89,17 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         user.save()
         return user
     
+
+
+class SocialTaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserDetails
+        fields = [
+            'tgID', 
+            'telegram_group_joined', 
+            'telegram_channel_joined', 
+            'x_page_followed', 
+            'x_earned',
+            'telegram_channel_earned', 
+            'telegram_group_earned', 
+        ]

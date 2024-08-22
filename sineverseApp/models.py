@@ -16,6 +16,13 @@ class UserDetails(models.Model):
     reward_earned = models.IntegerField(default=0)
     last_claimed = models.DateField(blank=True, null=True)
 
+    telegram_group_joined = models.BooleanField(default=False)
+    telegram_channel_joined = models.BooleanField(default=False)
+    x_page_followed = models.BooleanField(default=False)
+    x_earned = models.IntegerField(default=0)
+    telegram_channel_earned = models.IntegerField(default=0)
+    telegram_group_earned = models.IntegerField(default=0)
+
     def __str__(self):
         return f"This is user {self.name}"
     

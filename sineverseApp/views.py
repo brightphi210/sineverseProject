@@ -96,7 +96,7 @@ class ClaimRewardView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = UserDetails.objects.get(id=serializer.validated_data['user_id'])
+        user = UserDetails.objects.get(id=serializer.validated_data['tgID'])
         serializer.update(user, serializer.validated_data)
         return Response({"message": "Reward claimed successfully!"}, status=status.HTTP_200_OK)
     
@@ -146,3 +146,38 @@ class ListOfInvitesView(generics.ListCreateAPIView):
             },
                 status= status.HTTP_401_UNAUTHORIZED
             )
+        
+
+class PerformTaskView(generics.UpdateAPIView):
+    queryset = UserDetails.objects.all()
+    serializer_class = SocialTaskSerializer
+
+    def get_object(self):
+        tgID = self.request.data.get('tgID')
+        try:
+            user = UserDetails.objects.get(id=tgID)
+        except UserDetails.DoesNotExist:
+            user = UserDetails.objects.create(id=tgID)
+        return user
+
+    def patch(self, request, *args, **kwargs):
+        user = self.get_object()
+        task_type = request.data.get('task_type')
+
+        if task_type == 'telegram_group' and not user.telegram_group_joined:
+            user.telegram_group_joined = True
+            user.telegram_group_earned += 20000
+        elif task_type == 'telegram_channel' and not user.telegram_channel_joined:
+            user.telegram_channel_joined = True
+            user.telegram_channel_earned += 20000
+        elif task_type == 'x_page_followed' and not user.x_page_followed:
+            user.x_page_followed = True
+            user.x_earned += 20000
+        else:
+            return Response(
+                {"message": "Task already completed or invalid task type"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.save()
+        return Response(SocialTaskSerializer(user).data, status=status.HTTP_200_OK)
