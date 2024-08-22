@@ -203,19 +203,16 @@ def send_message(chat_id, message):
     response = requests.post(api_url, json=data)
     return response.json()
 
-
-
 def send_message_with_image(chat_id, message, image_path, encoded_keyboard):
     api_url = f'https://api.telegram.org/bot{bot_token}/sendPhoto'
     with open(image_path, 'rb') as photo:
         data = {
             'chat_id': chat_id,
             'caption': message,
-            'photo': photo,
             'reply_markup': encoded_keyboard
         }
-        response = requests.post(api_url, files=data)
-        send_message(chat_id, response)
+        files = {'photo': photo}
+        response = requests.post(api_url, data=data, files=files)
     return response.json()
 
 def send_start_webapp_button_with_referer(chat_id, username):
@@ -228,31 +225,15 @@ def send_start_webapp_button_with_referer(chat_id, username):
     image_path = "image.jpg"
     send_message_with_image(chat_id, welcome_message, image_path, encoded_keyboard)
 
-def process_update(update):
+@api_view(['POST'])
+def process_update(request):
+    update = request.data
     chat_id = update['message']['chat']['id']
     username = update['message']['from']['username']
 
     if 'text' in update['message'] and update['message']['text'].startswith('/start'):
         send_start_webapp_button_with_referer(chat_id, username)
-        # send_message(chat_id, "Starting . . .")
     else:
         send_message(chat_id, "Invalid command \n/start")
 
-
-
-
-@api_view(['POST'])
-def telegram_webhook(request):
-    update = request.data
-    process_update(update)
-    return JsonResponse({"status": "ok"}, status=200)
-
-
-import requests
-
-bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
-webhook_url = "https://sineverseproject.onrender.com/api/v1/telegram_bot/"
-set_webhook_url = f"https://api.telegram.org/bot{bot_token}/setWebhook?url={webhook_url}"
-
-response = requests.get(set_webhook_url)
-print(response.json())
+    return JsonResponse({'status': 'ok'})
