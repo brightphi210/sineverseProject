@@ -236,6 +236,9 @@ def process_update(update):
     else:
         send_message(chat_id, "Invalid command \n/start")
 
+
+
+
 @api_view(['POST'])
 def telegram_webhook(request):
     update = request.data
