@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
+from django.utils import timezone
 # Create your models here.
 class UserDetails(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -13,6 +13,8 @@ class UserDetails(models.Model):
     referral_code = models.CharField(max_length=10, unique=True, blank=True, null=True)
     referred_by = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='referrals')
     earned_energy = models.IntegerField(default=0)
+    reward_earned = models.IntegerField(default=0)
+    last_claimed = models.DateField(blank=True, null=True)
 
     def __str__(self):
         return f"This is user {self.name}"
@@ -27,6 +29,11 @@ class UserDetails(models.Model):
         # Generates a unique referral code (e.g., using a hash or random string)
         import random, string
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+    def can_claim_reward(self):
+        if self.last_claimed is None:
+            return True
+        return self.last_claimed < timezone.now().date()
 
 
 class SilverCoin(models.Model):

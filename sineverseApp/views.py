@@ -87,44 +87,18 @@ class SilverCoinsViewUpdate(generics.RetrieveUpdateDestroyAPIView):
 from django.utils import timezone
 
 # ============ DAILY REWARD =================
-
 class DailyRewardView(generics.ListCreateAPIView):
-    queryset = DailyReward.objects.all()
-    serializer_class = DailyRewardSerializer
+    pass
 
-    def get(self, request, *args, **kwargs):
-        # Assuming the user's tgID is passed in the request data
-        tgID = request.data.get('tgID')
-        user = UserDetails.objects.filter(tgID=tgID).first()
+class ClaimRewardView(generics.UpdateAPIView):
+    serializer_class = ClaimRewardSerializer
 
-        if not user:
-            return Response({"detail": "User not found."}, status=status.HTTP_404_NOT_FOUND)
-
-        today = timezone.now().date()
-        last_reward = DailyReward.objects.filter(user=user).order_by('-last_claimed').first()
-
-        if last_reward and last_reward.last_claimed == today:
-            return Response({"detail": "Daily reward already claimed for today."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Logic for calculating amount gained (this can be customized)
-        amount_gained = 100  # Example fixed amount or could be random or based on logic
-
-        # Create or update the daily reward
-        daily_reward = DailyReward.objects.create(
-            user=user,
-            oldAmount=user.position,
-            amountGained=amount_gained,
-            trackEachDayCount=(last_reward.trackEachDayCount + 1) if last_reward else 1,
-            last_claimed=today,
-            tgID=user.tgID
-        )
-
-        # Update user’s position (energy level)
-        user.position += amount_gained
-        user.save()
-
-        serializer = self.get_serializer(daily_reward)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def update(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = UserDetails.objects.get(id=serializer.validated_data['user_id'])
+        serializer.update(user, serializer.validated_data)
+        return Response({"message": "Reward claimed successfully!"}, status=status.HTTP_200_OK)
     
 
 

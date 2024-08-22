@@ -4,12 +4,28 @@ from .models import *
 from rest_framework.exceptions import ValidationError
 
 
+from django.utils import timezone
 
 # ============ DAILY REWARD SERIALIZER ===================
-class DailyRewardSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DailyReward
-        fields = '__all__'
+class ClaimRewardSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+
+    def validate(self, data):
+        try:
+            user = UserDetails.objects.get(id=data['user_id'])
+        except UserDetails.DoesNotExist:
+            raise serializers.ValidationError("User not found")
+
+        if not user.can_claim_reward():
+            raise serializers.ValidationError("Reward already claimed today")
+
+        return data
+
+    def update(self, instance, validated_data):
+        instance.last_claimed = timezone.now().date()
+        instance.reward_earned += 5000   # or any reward amount
+        instance.save()
+        return instance
 
 
 
@@ -39,7 +55,6 @@ class GoldCoinSerializer(serializers.ModelSerializer):
 # ============ USER DETAILS SERIALIZER =============
 class UserDetailsSerializer(serializers.ModelSerializer):
     # ============ ALL RELATED NAMES MODELS ==========
-    daily_reward = DailyRewardSerializer(required=False, read_only=True)
     silver_coin = SilverCoinSerializer(required=False, read_only=True)
     gold_coin = GoldCoinSerializer(read_only=True, required=False)
     wallet_address = WalletAddressSerializer(required=False, read_only=True)

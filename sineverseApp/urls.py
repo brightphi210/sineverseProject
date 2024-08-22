@@ -15,6 +15,7 @@ urlpatterns = [
     
     path('daily_reward/', DailyRewardView.as_view(), name='daily_reward'),
     # path('daily_reward/update/<str:pk>/', DailyRewardView.as_view(), name='daily_reward'),
+    path('claim_reward/', ClaimRewardView.as_view(), name='claim-reward'),
 
 
     # =================== WALLET ADDRESS ==================
