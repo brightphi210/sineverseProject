@@ -181,3 +181,43 @@ class PerformTaskView(generics.UpdateAPIView):
 
         user.save()
         return Response(SocialTaskSerializer(user).data, status=status.HTTP_200_OK)
+
+
+
+from rest_framework.views import APIView
+import json
+import requests
+bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
+web_app_url = "https://t.me/sinversexyz_bot/sinverse"
+welcome_message = ""#RESPONSE MESSAGE
+endpoint = "" #this particlar script endpoint
+
+class TelegramBotView(APIView):
+    def post(self, request, *args, **kwargs):
+        chat_id = request.data.get('chat_id')
+        username = request.data.get('username')
+
+        if chat_id and username:
+            self.send_start_webapp_button_with_referer(chat_id, username)
+            return Response({"message": "Success"}, status=status.HTTP_200_OK)
+        return Response({"message": "Bad Request"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def send_start_webapp_button_with_referer(self, chat_id, username):
+        keyboard = {
+            'inline_keyboard': [[
+                {'text': 'Launch XMeme 💰', 'url': web_app_url}
+            ]]
+        }
+        encoded_keyboard = json.dumps(keyboard)
+        self.send_message_with_image(chat_id, welcome_message, 'path_to_your_image.jpg', encoded_keyboard)
+
+    def send_message_with_image(self, chat_id, message, image_path, encoded_keyboard):
+        api_url = f'https://api.telegram.org/bot{bot_token}/sendPhoto'
+        with open(image_path, 'rb') as photo:
+            data = {
+                'chat_id': chat_id,
+                'caption': message,
+                'reply_markup': encoded_keyboard
+            }
+            response = requests.post(api_url, files={'photo': photo}, data={'chat_id': chat_id, 'caption': message, 'reply_markup': encoded_keyboard})
+        return response.json()
