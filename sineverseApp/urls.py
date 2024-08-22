@@ -18,6 +18,6 @@ urlpatterns = [
 
     # path('perform_task/', PerformTaskView.as_view(), name='perform_task'),
     path('social_task/', PerformTaskView.as_view(), name='perform-task'),
-    path('telegram_bot/', TelegramBotView.as_view(), name='telegram-bot-endpoint'),
+    path('telegram_bot/', telegram_webhook, name='telegram-bot-endpoint'),
 
 ]
