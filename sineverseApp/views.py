@@ -243,7 +243,6 @@ def telegram_webhook(request):
     return JsonResponse({"status": "ok"}, status=200)
 
 
-
 import requests
 
 bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
