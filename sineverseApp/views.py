@@ -215,6 +215,7 @@ def send_message_with_image(chat_id, message, image_path, encoded_keyboard):
             'reply_markup': encoded_keyboard
         }
         response = requests.post(api_url, files=data)
+        send_message(chat_id, response)
     return response.json()
 
 def send_start_webapp_button_with_referer(chat_id, username):
@@ -232,8 +233,8 @@ def process_update(update):
     username = update['message']['from']['username']
 
     if 'text' in update['message'] and update['message']['text'].startswith('/start'):
-        # send_start_webapp_button_with_referer(chat_id, username)
-        send_message(chat_id, "Starting . . .")
+        send_start_webapp_button_with_referer(chat_id, username)
+        # send_message(chat_id, "Starting . . .")
     else:
         send_message(chat_id, "Invalid command \n/start")
 
