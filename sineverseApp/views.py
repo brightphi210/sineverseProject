@@ -232,7 +232,8 @@ def process_update(update):
     username = update['message']['from']['username']
 
     if 'text' in update['message'] and update['message']['text'].startswith('/start'):
-        send_start_webapp_button_with_referer(chat_id, username)
+        # send_start_webapp_button_with_referer(chat_id, username)
+        send_message(chat_id, "Starting . . .")
     else:
         send_message(chat_id, "Invalid command \n/start")
 
