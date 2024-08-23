@@ -96,9 +96,23 @@ class ClaimRewardView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        user = UserDetails.objects.get(id=serializer.validated_data['tgID'])
+        user = UserDetails.objects.get(tgID=serializer.validated_data['tgID'])
         serializer.update(user, serializer.validated_data)
         return Response({"message": "Reward claimed successfully!"}, status=status.HTTP_200_OK)
+
+
+
+class RewardHistoryView(generics.ListAPIView):
+    serializer_class = RewardHistorySerializer
+
+    def get_queryset(self):
+        user_tgID = self.request.query_params.get('tgID')
+        try:
+            user = UserDetails.objects.get(tgID=user_tgID)
+        except UserDetails.DoesNotExist:
+            return RewardHistory.objects.none()
+        return RewardHistory.objects.filter(user=user).order_by('-claimed_date')
+
     
 
 

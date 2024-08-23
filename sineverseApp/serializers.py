@@ -8,11 +8,11 @@ from django.utils import timezone
 
 # ============ DAILY REWARD SERIALIZER ===================
 class ClaimRewardSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField()
+    tgID = serializers.CharField()
 
     def validate(self, data):
         try:
-            user = UserDetails.objects.get(id=data['user_id'])
+            user = UserDetails.objects.get(tgID=data['tgID'])
         except UserDetails.DoesNotExist:
             raise serializers.ValidationError("User not found")
 
@@ -22,10 +22,58 @@ class ClaimRewardSerializer(serializers.Serializer):
         return data
 
     def update(self, instance, validated_data):
+        # Update the user's reward and claim date
         instance.last_claimed = timezone.now().date()
-        instance.reward_earned += 5000   # or any reward amount
+        instance.reward_earned += 5000  # or any reward amount
         instance.save()
+        
+        # Create a new RewardHistory entry
+        RewardHistory.objects.create(
+            user=instance,
+            amount_earned=5000,  # or any reward amount
+            claimed_date=timezone.now().date()
+        )
+
         return instance
+
+
+class RewardHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RewardHistory
+        fields = ['amount_earned', 'claimed_date']
+
+
+# class ClaimRewardSerializer(serializers.Serializer):
+#     user_id = serializers.IntegerField()
+
+#     def validate(self, data):
+#         try:
+#             user = UserDetails.objects.get(id=data['user_id'])
+#         except UserDetails.DoesNotExist:
+#             raise serializers.ValidationError("User not found")
+
+#         if not user.can_claim_reward():
+#             raise serializers.ValidationError("Reward already claimed today")
+
+#         return data
+
+#     def update(self, instance, validated_data):
+#         instance.last_claimed = timezone.now().date()
+#         instance.reward_earned += 5000
+#         instance.save()
+
+#         DailyRewardHistory.objects.create(
+#             user=instance,
+#             amountGained=5000,
+#             date_claimed=timezone.now().date()
+#         )
+
+#         return instance
+
+# class DailyRewardHistorySerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = DailyRewardHistory
+#         fields = ['user', 'amount_gained', 'date_claimed']
 
 
 
@@ -59,6 +107,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
     gold_coin = GoldCoinSerializer(read_only=True, required=False)
     wallet_address = WalletAddressSerializer(required=False, read_only=True)
     list_invites = ListOfInvitesSerializer(many=True, required=False, read_only=True)
+    reward_history = RewardHistorySerializer(many=True, read_only=True, required=False)
 
     referral_code = serializers.CharField(read_only=True)
     referred_by_code = serializers.CharField(write_only=True, required=False)

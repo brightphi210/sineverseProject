@@ -70,6 +70,14 @@ class DailyReward(models.Model):
         return f"User {self.user.name} gained {self.amountGained} gold points on {self.last_claimed}."
     
 
+class RewardHistory(models.Model):
+    user = models.ForeignKey(UserDetails, related_name='reward_history', on_delete=models.CASCADE)
+    amount_earned  = models.IntegerField()
+    claimed_date  = models.DateField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.user.name} claimed {self.amount_earned} points on {self.claimed_date}"
+
 
 class WalletAddress(models.Model):
     user = models.OneToOneField(UserDetails, related_name='wallet_address', on_delete=models.CASCADE, blank=True, null=True)
