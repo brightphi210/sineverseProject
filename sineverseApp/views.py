@@ -148,6 +148,8 @@ class ListOfInvitesView(generics.ListCreateAPIView):
             )
         
 
+from rest_framework.exceptions import NotFound
+
 class PerformTaskView(generics.UpdateAPIView):
     queryset = UserDetails.objects.all()
     serializer_class = SocialTaskSerializer
@@ -155,9 +157,9 @@ class PerformTaskView(generics.UpdateAPIView):
     def get_object(self):
         tgID = self.request.data.get('tgID')
         try:
-            user = UserDetails.objects.get(id=tgID)
+            user = UserDetails.objects.get(tgID=tgID)  # Change 'id' to 'tgID'
         except UserDetails.DoesNotExist:
-            user = UserDetails.objects.create(id=tgID)
+            raise NotFound({"message": "User not found"})
         return user
 
     def patch(self, request, *args, **kwargs):
@@ -181,6 +183,7 @@ class PerformTaskView(generics.UpdateAPIView):
 
         user.save()
         return Response(SocialTaskSerializer(user).data, status=status.HTTP_200_OK)
+
 
 
 
