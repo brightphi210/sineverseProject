@@ -209,8 +209,8 @@ from rest_framework.decorators import api_view
 # Define your bot token and endpoint
 bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
 web_app_url = "https://t.me/sinversexyz_bot/sinverse"
-welcome_message = 'Welcome to Sinverse'
 endpoint = "https://sineverseproject.onrender.com/api/v1/"
+welcome_message = 'Welcome to Sinverse aaa'
 
 
 # """ Welcome to Sinverse, the first R-Rated mafia metaverse 
