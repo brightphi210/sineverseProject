@@ -210,13 +210,13 @@ from rest_framework.decorators import api_view
 bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
 web_app_url = "https://t.me/sinversexyz_bot/sinverse"
 welcome_message = 'Welcome to Sinverse'
+endpoint = "https://sineverseproject.onrender.com/api/v1/"
 
 
 # """ Welcome to Sinverse, the first R-Rated mafia metaverse 
 # built on the blockchain. 🎮 Tap your way to the top of the 
 # leaderboard and be among the 1,000 lucky players 🎯 invited 
 # to the SinVerse maiden lottery event! 🎟 Dare to win!💰"""
-endpoint = "https://sineverseproject.onrender.com/api/v1/"
 
 
 # Define the URL to set the webhook
@@ -305,8 +305,8 @@ def process_update(update):
 
 @api_view(['POST'])
 def telegram_webhook(request):
-    # update = request.data
-    update = request.get_json()
+    update = request.data
+    # update = request.get_json()
     process_update(update)
     return JsonResponse({"status": "ok"}, status=200)
 
