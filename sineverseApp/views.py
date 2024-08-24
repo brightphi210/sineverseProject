@@ -278,10 +278,10 @@ def process_update(update):
 
             # Prepare data for the API request
             data = {
-                'referral_code': ref_code,
+                'ref_code': ref_code,
                 'invited_id': username
             }
-            url = f'{endpoint}/referral/'
+            url = f'{endpoint}/add_invite.php'
 
             # Send the POST request to the API
             headers = {'Content-Type': 'application/json'}
@@ -309,6 +309,11 @@ def telegram_webhook(request):
     # update = request.get_json()
     process_update(update)
     return JsonResponse({"status": "ok"}, status=200)
+
+
+
+
+
 
 from rest_framework.views import APIView
 class ReferralView(APIView):
