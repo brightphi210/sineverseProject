@@ -39,13 +39,37 @@ class UserDetails(models.Model):
         import random, string
         return ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
 
-    def can_claim_reward(self):
-        if self.last_claimed is None:
-            return True
-        return self.last_claimed < timezone.now().date()
+    # def can_claim_reward(self):
+    #     if self.last_claimed is None:
+    #         return True
+    #     return self.last_claimed < timezone.now().date()
+
+    def claim_reward(self, day):
+        try:
+            reward = DailyReward.objects.get(day=day)
+        except DailyReward.DoesNotExist:
+            raise ValueError("Invalid reward day.")
+        
+        if reward.is_claimed:
+            raise ValueError("Reward for this day has already been claimed.")
+        
+        today = timezone.now().date()
+        
+        # If any day before this day is unclaimed, remove all claims
+        if self.last_claimed and day > (self.last_claimed.day + 1):
+            RewardHistory.objects.filter(user=self).delete()
+            self.silver_coin.amount = 0
+            self.save()
+        
+        # Claim reward for this day
+        self.silver_coin.amount += reward.amount
+        reward.is_claimed = True
+        reward.save()
+        
+        RewardHistory.objects.create(user=self, reward=reward)
+        self.last_claimed = timezone.now().date()
+        self.save()
     
-
-
     def convert_silver_to_gold(self):
         
         try:
@@ -84,25 +108,63 @@ class GoldCoin(models.Model):
         return f"User {self.amount} gold coins."
 
 
-class DailyReward(models.Model):
-    user = models.OneToOneField(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
-    oldAmount = models.IntegerField(default=0)
-    amountGained = models.IntegerField(default=0)
-    trackEachDayCount = models.IntegerField(default=0)
-    last_claimed = models.DateField(auto_now_add=True)
-    tgID = models.CharField(blank=True, null=True, max_length=255)
+# class DailyReward(models.Model):
+#     user = models.OneToOneField(UserDetails, related_name='daily_reward', on_delete=models.CASCADE, blank=True, null=True)
+#     oldAmount = models.IntegerField(default=0)
+#     amountGained = models.IntegerField(default=0)
+#     trackEachDayCount = models.IntegerField(default=0)
+#     last_claimed = models.DateField(auto_now_add=True)
+#     tgID = models.CharField(blank=True, null=True, max_length=255)
 
-    def _str__(self):
-        return f"User {self.user.name} gained {self.amountGained} gold points on {self.last_claimed}."
+#     def _str__(self):
+#         return f"User {self.user.name} gained {self.amountGained} gold points on {self.last_claimed}."
     
 
-class RewardHistory(models.Model):
-    user = models.ForeignKey(UserDetails, related_name='reward_history', on_delete=models.CASCADE)
-    amount_earned  = models.IntegerField()
-    claimed_date  = models.DateField(default=timezone.now)
+# class RewardHistory(models.Model):
+#     user = models.ForeignKey(UserDetails, related_name='reward_history', on_delete=models.CASCADE)
+#     amount_earned  = models.IntegerField()
+#     claimed_date  = models.DateField(default=timezone.now)
 
+#     def __str__(self):
+#         return f"{self.user.name} claimed {self.amount_earned} points on {self.claimed_date}"
+
+
+
+class DailyReward(models.Model):
+    day = models.IntegerField(unique=True, null=True, blank=True)  # 1 to 9
+    amount = models.IntegerField(null=True, blank=True)
+    is_claimed = models.BooleanField(default=False, null=True, blank=True)
+    
     def __str__(self):
-        return f"{self.user.name} claimed {self.amount_earned} points on {self.claimed_date}"
+        return f"Day {self.day} Reward: {self.amount} silver coins"
+    
+    @classmethod
+    def initialize_rewards(cls):
+        # Initialize rewards for each day
+        rewards = [
+            (1, 1000),
+            (2, 2500),
+            (3, 5000),
+            (4, 15000),
+            (5, 25000),
+            (6, 100000),
+            (7, 500000),
+            (8, 1000000),
+            (9, 5000000),
+            # Add other days
+        ]
+        for day, amount in rewards:
+            cls.objects.get_or_create(day=day, defaults={'amount': amount})
+
+class RewardHistory(models.Model):
+    user = models.ForeignKey(UserDetails, on_delete=models.CASCADE, null=True, blank=True)
+    reward = models.ForeignKey(DailyReward, on_delete=models.CASCADE, null=True, blank=True)
+    claimed_at = models.DateTimeField(default=timezone.now, null=True, blank=True)
+    
+    def __str__(self):
+        return f"{self.user} claimed Day {self.reward.day} reward"
+
+
 
 
 class WalletAddress(models.Model):

@@ -4,6 +4,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from . models import *
 from . serializers import *
+from rest_framework.views import APIView
+
 # Create your views here.
 
 
@@ -73,16 +75,12 @@ class SilverCoinsView(generics.UpdateAPIView):
         silver_coin, created = SilverCoin.objects.get_or_create(user=user_details)
 
         current_amount = silver_coin.amount
-
         # Get the new amount from the request
         new_amount = request.data.get('amount', 0)  # Default to 0 if not provided
-
         # Update the silver coin amount by adding the new amount
         silver_coin.amount = current_amount + int(new_amount)
-
         # Save the updated silver coin object
         silver_coin.save()
-
         # Serialize and return the updated silver coin object
         serializer = self.get_serializer(silver_coin)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -96,31 +94,45 @@ class SilverCoinsViewUpdate(generics.RetrieveUpdateDestroyAPIView):
 from django.utils import timezone
 
 # ============ DAILY REWARD =================
-class DailyRewardView(generics.ListCreateAPIView):
-    pass
+# class DailyRewardView(generics.ListCreateAPIView):
+#     pass
 
-class ClaimRewardView(generics.UpdateAPIView):
-    serializer_class = ClaimRewardSerializer
+# class ClaimRewardView(generics.UpdateAPIView):
+#     serializer_class = ClaimRewardSerializer
 
-    def update(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = UserDetails.objects.get(tgID=serializer.validated_data['tgID'])
-        serializer.update(user, serializer.validated_data)
-        return Response({"message": "Reward claimed successfully!"}, status=status.HTTP_200_OK)
+#     def update(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         user = UserDetails.objects.get(tgID=serializer.validated_data['tgID'])
+#         serializer.update(user, serializer.validated_data)
+#         return Response({"message": "Reward claimed successfully!"}, status=status.HTTP_200_OK)
 
 
-
-class RewardHistoryView(generics.ListAPIView):
-    serializer_class = RewardHistorySerializer
-
-    def get_queryset(self):
-        user_tgID = self.request.query_params.get('tgID')
+class ClaimRewardView(APIView):
+    def post(self, request, day):
+        user_id = request.data.get('user_id')
         try:
-            user = UserDetails.objects.get(tgID=user_tgID)
+            user = UserDetails.objects.get(id=user_id)
         except UserDetails.DoesNotExist:
-            return RewardHistory.objects.none()
-        return RewardHistory.objects.filter(user=user).order_by('-claimed_date')
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            user.claim_reward(day)
+            return Response({"message": "Reward claimed successfully"}, status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# class RewardHistoryView(generics.ListAPIView):
+#     serializer_class = RewardHistorySerializer
+
+#     def get_queryset(self):
+#         user_tgID = self.request.query_params.get('tgID')
+#         try:
+#             user = UserDetails.objects.get(tgID=user_tgID)
+#         except UserDetails.DoesNotExist:
+#             return RewardHistory.objects.none()
+#         return RewardHistory.objects.filter(user=user).order_by('-claimed_date')
 
     
 
@@ -320,7 +332,6 @@ def telegram_bot(request):
 
 
 
-from rest_framework.views import APIView
 class ReferralView(APIView):
     def post(self, request):
         serializer = ReferralSerializer(data=request.data)
