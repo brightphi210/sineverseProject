@@ -106,6 +106,16 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         return user
     
 
+    
+class ConvertCoinsSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    amount = serializers.IntegerField()
+
+    def validate(self, data):
+        user = UserDetails.objects.get(id=data['user_id'])
+        if user.silver_coin.amount < data['amount']:
+            raise serializers.ValidationError("Not enough silver coins.")
+        return data
 
 class SocialTaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -144,3 +154,6 @@ class ReferralSerializer(serializers.Serializer):
             raise serializers.ValidationError("Referee has already been referred by someone.")
         
         return data
+
+
+

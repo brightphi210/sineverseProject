@@ -21,5 +21,6 @@ urlpatterns = [
     path('telegram_bot/', telegram_bot, name='telegram_bot'),
 
     path('referral/', ReferralView.as_view(), name='referral'),
+    path('convert_coin/', ConvertCoinsView.as_view(), name='convert_coin'),
 
 ]

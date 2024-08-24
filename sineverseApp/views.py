@@ -72,10 +72,19 @@ class SilverCoinsView(generics.UpdateAPIView):
         
         silver_coin, created = SilverCoin.objects.get_or_create(user=user_details)
 
-        serializer = self.get_serializer(silver_coin, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        current_amount = silver_coin.amount
 
+        # Get the new amount from the request
+        new_amount = request.data.get('amount', 0)  # Default to 0 if not provided
+
+        # Update the silver coin amount by adding the new amount
+        silver_coin.amount = current_amount + int(new_amount)
+
+        # Save the updated silver coin object
+        silver_coin.save()
+
+        # Serialize and return the updated silver coin object
+        serializer = self.get_serializer(silver_coin)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -329,4 +338,26 @@ class ReferralView(APIView):
 
             return Response({"message": "Referral successful, energy earned!"}, status=status.HTTP_200_OK)
         
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+
+class ConvertCoinsView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = ConvertCoinsSerializer(data=request.data)
+        if serializer.is_valid():
+            user_id = serializer.validated_data['user_id']
+            amount = serializer.validated_data['amount']
+            user = UserDetails.objects.get(id=user_id)
+            
+            try:
+                user.convert_silver_to_gold()
+                return Response({"message": "Conversion successful"}, status=status.HTTP_200_OK)
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

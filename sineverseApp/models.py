@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
+from django.core.exceptions import ObjectDoesNotExist  # Import for exception handling
 
 from django.utils import timezone
 # Create your models here.
@@ -41,21 +43,45 @@ class UserDetails(models.Model):
         if self.last_claimed is None:
             return True
         return self.last_claimed < timezone.now().date()
+    
 
+
+    def convert_silver_to_gold(self):
+        
+        try:
+            silver_coin = SilverCoin.objects.get(user=self)
+        except ObjectDoesNotExist:
+            raise ValueError("SilverCoin record does not exist for this user.")
+        
+        try:
+            gold_coin = GoldCoin.objects.get(user=self)
+        except ObjectDoesNotExist:
+            # Create a new GoldCoin record if it does not exist
+            gold_coin = GoldCoin(user=self, amount=0)
+        
+        if silver_coin.amount >= 2000:
+            gold_conversion = silver_coin.amount // 2000
+            gold_coin.amount += gold_conversion
+            silver_coin.amount -= gold_conversion * 2000
+            
+            silver_coin.save()
+            gold_coin.save()
+        else:
+            raise ValueError("Not enough silver coins to convert to gold.")
 
 class SilverCoin(models.Model):
     user = models.OneToOneField(UserDetails, related_name='silver_coin', on_delete=models.CASCADE, blank=True, null=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
 
     def __str__(self):
-        return f"User {self.user.name} has {self.amount} silver coins."
+        return f"User {self.amount} silver coins."
     
 class GoldCoin(models.Model):
     user = models.OneToOneField(UserDetails, related_name='gold_coin', on_delete=models.CASCADE, null=True , blank=True)
     amount = models.IntegerField(default=0, blank=True, null=True)
     
     def __str__(self):
-        return f"User {self.user.name} has {self.amount} gold coins."
+        return f"User {self.amount} gold coins."
 
 
 class DailyReward(models.Model):
