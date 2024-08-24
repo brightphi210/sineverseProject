@@ -278,10 +278,10 @@ def process_update(update):
 
             # Prepare data for the API request
             data = {
-                'ref_code': ref_code,
-                'invited_id': username
+                'referral_code': ref_code,
+                'referee_id': username
             }
-            url = f'{endpoint}/add_invite.php'
+            url = f'{endpoint}/referral/'
 
             # Send the POST request to the API
             headers = {'Content-Type': 'application/json'}
