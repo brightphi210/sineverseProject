@@ -200,16 +200,21 @@ class PerformTaskView(generics.UpdateAPIView):
 
 
 
-
 import json
 import requests
+import os
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 
 # Define your bot token and endpoint
 bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
 web_app_url = "https://t.me/sinversexyz_bot/sinverse"
-welcome_message = "Welcome to Sinversexyz"
+welcome_message = "Welcome to Sinversexyz"#RESPONSE MESSAGE
+endpoint = "https://sineverseproject.onrender.com/api/v1/"
+
+
+# Define the URL to set the webhook
+#webhook_url = f"https://api.telegram.org/bot7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c/setWebhook?url=https://sineverseproject.onrender.com/api/v1/telegram_bot/" #replace  bot_token and this script enpoint url
 
 def send_message(chat_id, message):
     api_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
@@ -220,42 +225,95 @@ def send_message(chat_id, message):
     response = requests.post(api_url, json=data)
     return response.json()
 
-def send_message_with_image(chat_id, message, image_path, encoded_keyboard):
+def send_message_with_image(chat_id, message, image_name, encoded_keyboard):
     api_url = f'https://api.telegram.org/bot{bot_token}/sendPhoto'
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Construct the full path to the image
+    image_path = os.path.join(script_dir, image_name)
+
     with open(image_path, 'rb') as photo:
+        # The 'files' parameter is specifically for file data (like images)
+        files = {'photo': photo}
+
+        # The 'data' parameter is for other form data
         data = {
             'chat_id': chat_id,
             'caption': message,
             'reply_markup': encoded_keyboard
         }
-        files = {
-            'photo': photo
-        }
+
+        # Sending the POST request with both data and files
         response = requests.post(api_url, data=data, files=files)
-        return response.json()
+    return response.json()
 
 def send_start_webapp_button_with_referer(chat_id, username):
     keyboard = {
         'inline_keyboard': [[
-            {'text': 'Launch XMeme 💰', 'url': web_app_url}
+            {'text': 'Launch Sinersexyz 💰', 'url': web_app_url}
         ]]
     }
     encoded_keyboard = json.dumps(keyboard)
     image_path = "image.jpg"
     send_message_with_image(chat_id, welcome_message, image_path, encoded_keyboard)
 
+# Get the incoming message data
 def process_update(update):
     chat_id = update['message']['chat']['id']
     username = update['message']['from']['username']
 
-    if 'text' in update['message'] and update['message']['text'].startswith('/start'):
-        send_start_webapp_button_with_referer(chat_id, username)
-        send_message('STarting...')
+    # Check if the update contains a message with text and starts with '/start'
+    if 'message' in update and 'text' in update['message'] and update['message']['text'].startswith('/start'):
+        # Extract the ref_code from the message
+        start_command = update['message']['text'].split(' ', 1)
+
+        if len(start_command) > 1:
+            ref_code = start_command[1]
+
+            # Prepare data for the API request
+            data = {
+                'ref_code': ref_code,
+                'invited_id': username
+            }
+            url = f'{endpoint}/add_invite.php'
+
+            # Send the POST request to the API
+            headers = {'Content-Type': 'application/json'}
+            response = requests.post(url, headers=headers, data=json.dumps(data))
+
+            # Decode the JSON response
+            response_data = response.json()
+
+            # Check the response status
+            if response_data.get('status') == 'success':
+                # Send the welcome message with the inline keyboard
+                send_start_webapp_button_with_referer(chat_id, username)
+            else:
+                # Handle error by sending a message to the user
+                send_message(chat_id, f"{response_data.get('message', 'Error')} /start")
+        else:
+            send_start_webapp_button_with_referer(chat_id, username)
     else:
-        send_message(chat_id, "Invalid command \n/start")
+        # Handle the case where the text does not start with '/start'
+        send_message(chat_id, "Invalid command\n/start")
 
 @api_view(['POST'])
 def telegram_webhook(request):
     update = request.data
+    # update = request.get_json()
     process_update(update)
     return JsonResponse({"status": "ok"}, status=200)
+
+
+# def webhook():
+#     update = request.get_json()
+#     process_update(update)
+
+
+#     return "OK"
+
+# @api_view(['POST'])
+# def telegram_webhook(request):
+#     update = request.data
+#     process_update(update)
+#     return JsonResponse({"status": "ok"}, status=200)
