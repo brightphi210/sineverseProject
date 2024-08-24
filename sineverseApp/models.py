@@ -59,10 +59,10 @@ class UserDetails(models.Model):
             # Create a new GoldCoin record if it does not exist
             gold_coin = GoldCoin(user=self, amount=0)
         
-        if silver_coin.amount >= 2000:
-            gold_conversion = silver_coin.amount // 2000
+        if silver_coin.amount >= 25000000:
+            gold_conversion = silver_coin.amount // 25000000
             gold_coin.amount += gold_conversion
-            silver_coin.amount -= gold_conversion * 2000
+            silver_coin.amount -= gold_conversion * 25000000
             
             silver_coin.save()
             gold_coin.save()
