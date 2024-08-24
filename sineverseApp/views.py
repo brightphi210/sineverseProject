@@ -281,7 +281,7 @@ def process_update(update):
                 'referral_code': ref_code,
                 'invited_id': username
             }
-            url = f'{endpoint}/add_invite.php'
+            url = f'{endpoint}/referral/'
 
             # Send the POST request to the API
             headers = {'Content-Type': 'application/json'}
@@ -305,8 +305,8 @@ def process_update(update):
 
 @api_view(['POST'])
 def telegram_webhook(request):
-    update = request.data
-    # update = request.get_json()
+    # update = request.data
+    update = request.get_json()
     process_update(update)
     return JsonResponse({"status": "ok"}, status=200)
 
