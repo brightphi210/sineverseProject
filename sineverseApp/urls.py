@@ -20,4 +20,6 @@ urlpatterns = [
     path('social_task/', PerformTaskView.as_view(), name='perform-task'),
     path('telegram_bot/', telegram_webhook, name='telegram-bot-endpoint'),
 
+    path('referral/', ReferralView.as_view(), name='referral'),
+
 ]

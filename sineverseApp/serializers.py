@@ -43,39 +43,6 @@ class RewardHistorySerializer(serializers.ModelSerializer):
         fields = ['amount_earned', 'claimed_date']
 
 
-# class ClaimRewardSerializer(serializers.Serializer):
-#     user_id = serializers.IntegerField()
-
-#     def validate(self, data):
-#         try:
-#             user = UserDetails.objects.get(id=data['user_id'])
-#         except UserDetails.DoesNotExist:
-#             raise serializers.ValidationError("User not found")
-
-#         if not user.can_claim_reward():
-#             raise serializers.ValidationError("Reward already claimed today")
-
-#         return data
-
-#     def update(self, instance, validated_data):
-#         instance.last_claimed = timezone.now().date()
-#         instance.reward_earned += 5000
-#         instance.save()
-
-#         DailyRewardHistory.objects.create(
-#             user=instance,
-#             amountGained=5000,
-#             date_claimed=timezone.now().date()
-#         )
-
-#         return instance
-
-# class DailyRewardHistorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = DailyRewardHistory
-#         fields = ['user', 'amount_gained', 'date_claimed']
-
-
 
 class WalletAddressSerializer(serializers.ModelSerializer):
     class Meta:
@@ -152,3 +119,28 @@ class SocialTaskSerializer(serializers.ModelSerializer):
             'telegram_channel_earned', 
             'telegram_group_earned', 
         ]
+
+
+
+from rest_framework import serializers
+from .models import UserDetails
+
+class ReferralSerializer(serializers.Serializer):
+    referral_code = serializers.CharField(max_length=10)
+    referee_id = serializers.IntegerField()
+
+    def validate(self, data):
+        try:
+            inviter = UserDetails.objects.get(referral_code=data['referral_code'])
+        except UserDetails.DoesNotExist:
+            raise serializers.ValidationError("Invalid referral code.")
+
+        try:
+            referee = UserDetails.objects.get(pk=data['referee_id'])
+        except UserDetails.DoesNotExist:
+            raise serializers.ValidationError("Referee does not exist.")
+        
+        if referee.referred_by is not None:
+            raise serializers.ValidationError("Referee has already been referred by someone.")
+        
+        return data

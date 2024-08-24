@@ -209,8 +209,13 @@ from rest_framework.decorators import api_view
 # Define your bot token and endpoint
 bot_token = '7459191551:AAGc8AEtA7fbRzFbFlGGgu4JlOtg8FYBl5c'
 web_app_url = "https://t.me/sinversexyz_bot/sinverse"
-welcome_message = """ Welcome to Sinverse, the first R-Rated mafia metaverse built on the blockchain. 🎮 Tap your way to the top of the leaderboard and be among the 1,000 lucky players 🎯 invited to the SinVerse maiden lottery event! 🎟 Dare to win! 💰
-"""
+welcome_message = 'Welcome to Sinverse'
+
+
+# """ Welcome to Sinverse, the first R-Rated mafia metaverse 
+# built on the blockchain. 🎮 Tap your way to the top of the 
+# leaderboard and be among the 1,000 lucky players 🎯 invited 
+# to the SinVerse maiden lottery event! 🎟 Dare to win!💰"""
 endpoint = "https://sineverseproject.onrender.com/api/v1/"
 
 
@@ -273,7 +278,7 @@ def process_update(update):
 
             # Prepare data for the API request
             data = {
-                'ref_code': ref_code,
+                'referral_code': ref_code,
                 'invited_id': username
             }
             url = f'{endpoint}/add_invite.php'
@@ -305,16 +310,22 @@ def telegram_webhook(request):
     process_update(update)
     return JsonResponse({"status": "ok"}, status=200)
 
+from rest_framework.views import APIView
+class ReferralView(APIView):
+    def post(self, request):
+        serializer = ReferralSerializer(data=request.data)
+        if serializer.is_valid():
+            inviter = UserDetails.objects.get(referral_code=serializer.validated_data['referral_code'])
+            referee = UserDetails.objects.get(pk=serializer.validated_data['referee_id'])
 
-# def webhook():
-#     update = request.get_json()
-#     process_update(update)
+            # Update inviter's earned energy
+            inviter.earned_energy += 5000
+            inviter.save()
 
+            # Set the referee's referred_by field
+            referee.referred_by = inviter
+            referee.save()
 
-#     return "OK"
-
-# @api_view(['POST'])
-# def telegram_webhook(request):
-#     update = request.data
-#     process_update(update)
-#     return JsonResponse({"status": "ok"}, status=200)
+            return Response({"message": "Referral successful, energy earned!"}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
