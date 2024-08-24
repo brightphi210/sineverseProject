@@ -304,9 +304,8 @@ def process_update(update):
         send_message(chat_id, "Invalid command\n/start")
 
 @api_view(['POST'])
-def telegram_webhook(request):
+def telegram_bot(request):
     update = request.data
-    # update = request.get_json()
     process_update(update)
     return JsonResponse({"status": "ok"}, status=200)
 
